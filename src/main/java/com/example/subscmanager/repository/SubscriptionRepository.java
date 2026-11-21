@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
  * サブスクリプション契約情報のデータベース操作を担うリポジトリインターフェース。
  */
 @Repository
-public interface SubscriptionRepository {
+public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
 
 }
