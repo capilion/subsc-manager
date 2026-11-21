@@ -1,5 +1,6 @@
 package com.example.subscmanager.service;
 
+import com.example.subscmanager.repository.SubscriptionRepository;
 import com.example.subscmanager.domain.BillingCycle;
 import com.example.subscmanager.domain.Subscription;
 import com.example.subscmanager.domain.SubscriptionManager;
@@ -13,27 +14,36 @@ import java.util.Map;
  */
 @Service
 public class SubscriptionService {
-    private final SubscriptionManager manager = new SubscriptionManager();
+    private final SubscriptionRepository repository;
 
-    public SubscriptionService() {
-        manager.add(new Subscription("amazon", 500, BillingCycle.MONTHLY, "買い物"));
-        manager.add(new Subscription("rakuten", 11000, BillingCycle.YEARLY, "買い物"));
-        manager.add(new Subscription("netflix", 1500, BillingCycle.MONTHLY, "エンタメ"));
+    public SubscriptionService(SubscriptionRepository repository) {
+        this.repository = repository;
+        repository.save(new Subscription("amazon", 500, BillingCycle.MONTHLY, "買い物"));
+        repository.save(new Subscription("rakuten", 11000, BillingCycle.YEARLY, "買い物"));
+        repository.save(new Subscription("netflix", 1500, BillingCycle.MONTHLY, "エンタメ"));
     }
 
     public void add(Subscription subscription) {
-        manager.add(subscription);
+        repository.save(subscription);
     }
 
     public List<Subscription> getAll() {
-        return manager.getAll();
+        return repository.findAll();
+    }
+
+    private SubscriptionManager createManagerFromDb() {
+        SubscriptionManager manager = new SubscriptionManager();
+        for (Subscription sub : repository.findAll()) {
+            manager.add(sub);
+        }
+        return manager;
     }
 
     public int getTotalMonthlyPrice() {
-        return manager.getTotalMonthlyPrice();
+        return createManagerFromDb().getTotalMonthlyPrice();
     }
 
     public Map<String, Integer> getMonthlyPriceByCategory() {
-        return manager.getMonthlyPriceByCategory();
+        return createManagerFromDb().getMonthlyPriceByCategory();
     }
 }
